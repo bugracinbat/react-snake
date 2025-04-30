@@ -1,0 +1,187 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-900 text-white min-h-screen;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    box-sizing: border-box;
+  }
+
+  /* Improve focus styles for better accessibility */
+  :focus-visible {
+    @apply outline-none ring-2 ring-vercel-blue ring-offset-2 ring-offset-gray-900;
+  }
+}
+
+@layer components {
+  .game-grid {
+    @apply grid gap-0.5;
+    background-color: #1a1a1a;
+    width: 100%;
+    max-width: 500px;
+    aspect-ratio: 1;
+    border: 2px solid var(--grid-border);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+  }
+
+  .game-grid > div {
+    border: 1px solid var(--grid-border);
+    border-radius: 0.125rem;
+  }
+
+  .snake-segment {
+    @apply rounded-sm transition-all duration-100;
+    border: none !important;
+  }
+
+  .food {
+    @apply rounded-full bg-red-500 animate-pulse;
+    border: none !important;
+  }
+
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900;
+  }
+
+  .btn-primary {
+    @apply bg-vercel-blue text-white hover:bg-blue-600 focus:ring-blue-500;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-700 text-white hover:bg-gray-600 focus:ring-gray-500;
+  }
+
+  .power-up {
+    @apply rounded-lg animate-bounce;
+    border: none !important;
+  }
+
+  .power-up[data-type="SPEED"] {
+    @apply bg-yellow-500;
+  }
+
+  .power-up[data-type="SLOW"] {
+    @apply bg-blue-500;
+  }
+
+  .power-up[data-type="POINTS"] {
+    @apply bg-green-500;
+  }
+
+  .power-up[data-type="GHOST"] {
+    @apply bg-purple-500;
+  }
+}
+
+/* Base styles */
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  --vercel-blue: #0070f3;
+  --vercel-cyan: #50e3c2;
+  --vercel-purple: #7928ca;
+  --grid-border: rgba(255, 255, 255, 0.1);
+}
+
+html {
+  @apply overflow-hidden;
+  height: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  body {
+    padding: 0.5rem;
+  }
+
+  .game-grid {
+    @apply gap-0;
+    max-width: 100%;
+    height: auto;
+    padding: 0.25rem;
+  }
+
+  .game-grid > div {
+    border-width: 0.5px;
+  }
+}
+
+/* High contrast mode support */
+@media (forced-colors: active) {
+  .snake-segment {
+    border: 1px solid CanvasText !important;
+  }
+
+  .food {
+    border: 1px solid CanvasText !important;
+  }
+
+  .power-up {
+    border: 1px solid CanvasText !important;
+  }
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
