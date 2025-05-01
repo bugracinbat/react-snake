@@ -2,6 +2,14 @@
 
 A modern, feature-rich Snake game built with React, TypeScript, and Tailwind CSS. Inspired by Vercel's design aesthetic, this game includes power-ups, achievements, and a leaderboard system.
 
+## Screenshots
+
+![Game Screenshot](screenshots/game.png)
+_Game in action with power-ups and achievements_
+
+![Leaderboard Screenshot](screenshots/leaderboard.png)
+_Leaderboard showing top scores_
+
 ## Features
 
 ### Core Gameplay
