@@ -21,6 +21,24 @@
   :focus-visible {
     @apply outline-none ring-2 ring-vercel-blue ring-offset-2 ring-offset-gray-900;
   }
+
+  /* Title gradient animation */
+  @keyframes gradient {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  h1 {
+    background-size: 200% auto;
+    animation: gradient 8s ease infinite;
+  }
 }
 
 @layer components {
@@ -46,8 +64,9 @@
   }
 
   .food {
-    @apply rounded-full bg-red-500 animate-pulse;
+    @apply rounded-full bg-red-500;
     border: none !important;
+    animation: pulse 1s ease-in-out infinite;
   }
 
   .btn {
@@ -63,24 +82,44 @@
   }
 
   .power-up {
-    @apply rounded-lg animate-bounce;
+    @apply rounded-lg;
     border: none !important;
+    animation: bounce 1s ease-in-out infinite, glow 2s ease-in-out infinite;
+    position: relative;
+  }
+
+  .power-up::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: 0.5rem;
+    background: linear-gradient(45deg, transparent, currentColor, transparent);
+    animation: rotate 2s linear infinite;
+    opacity: 0.5;
   }
 
   .power-up[data-type="SPEED"] {
     @apply bg-yellow-500;
+    color: #fbbf24;
   }
 
   .power-up[data-type="SLOW"] {
     @apply bg-blue-500;
+    color: #60a5fa;
   }
 
   .power-up[data-type="POINTS"] {
     @apply bg-green-500;
+    color: #34d399;
   }
 
   .power-up[data-type="GHOST"] {
     @apply bg-purple-500;
+    color: #a78bfa;
+  }
+
+  .power-up.collecting {
+    animation: collect 0.5s ease-out forwards;
   }
 }
 
@@ -107,6 +146,64 @@ html {
   height: 100%;
 }
 
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-25%) scale(1.1);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.95);
+  }
+}
+
+@keyframes glow {
+  0%,
+  100% {
+    box-shadow: 0 0 5px currentColor;
+    filter: brightness(1);
+  }
+  50% {
+    box-shadow: 0 0 20px currentColor;
+    filter: brightness(1.2);
+  }
+}
+
+@keyframes collect {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* Responsive adjustments */
 @media (max-width: 640px) {
   body {
@@ -122,6 +219,10 @@ html {
 
   .game-grid > div {
     border-width: 0.5px;
+  }
+
+  .power-up {
+    animation: bounce 1.5s ease-in-out infinite, glow 3s ease-in-out infinite;
   }
 }
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { LeaderboardEntry } from "../types";
 
 const LEADERBOARD_KEY = "snake-leaderboard";
+export const LEADERBOARD_UPDATE_EVENT = "leaderboard-update";
 
 export const addToLeaderboard = (entry: LeaderboardEntry) => {
   const leaderboard = getLeaderboard();
@@ -11,6 +12,8 @@ export const addToLeaderboard = (entry: LeaderboardEntry) => {
     LEADERBOARD_KEY,
     JSON.stringify(leaderboard.slice(0, 10))
   );
+  // Dispatch custom event for real-time updates
+  window.dispatchEvent(new CustomEvent(LEADERBOARD_UPDATE_EVENT));
 };
 
 export const getLeaderboard = (): LeaderboardEntry[] => {
@@ -22,7 +25,17 @@ export default function Leaderboard() {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
 
   useEffect(() => {
-    setEntries(getLeaderboard());
+    const updateLeaderboard = () => {
+      setEntries(getLeaderboard());
+    };
+
+    // Initial load
+    updateLeaderboard();
+
+    // Listen for updates
+    window.addEventListener(LEADERBOARD_UPDATE_EVENT, updateLeaderboard);
+    return () =>
+      window.removeEventListener(LEADERBOARD_UPDATE_EVENT, updateLeaderboard);
   }, []);
 
   return (
@@ -31,8 +44,8 @@ export default function Leaderboard() {
       <div className="space-y-2">
         {entries.map((entry, index) => (
           <div
-            key={index}
-            className="flex justify-between items-center p-2 bg-gray-800 rounded-lg"
+            key={`${entry.name}-${entry.date}`}
+            className="flex justify-between items-center p-2 bg-gray-800 rounded-lg transform transition-all duration-300 hover:scale-105"
           >
             <div className="flex items-center gap-2">
               <span className="text-gray-400">#{index + 1}</span>

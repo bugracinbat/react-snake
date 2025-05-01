@@ -99,6 +99,7 @@ export default function Game() {
   const gameLoop = useRef<number | undefined>(undefined);
   const speedUpCount = useRef(0);
   const ghostUsed = useRef(false);
+  const [lastPlayerName, setLastPlayerName] = useState<string>("");
 
   const wrapPosition = (pos: Position): Position => {
     let newX = pos.x;
@@ -156,6 +157,15 @@ export default function Game() {
   const applyPowerUp = useCallback(
     (type: PowerUpType) => {
       playPowerUp();
+      // Add collecting class to trigger animation
+      const powerUpElement = document.querySelector(`[data-type="${type}"]`);
+      if (powerUpElement) {
+        powerUpElement.classList.add("collecting");
+        setTimeout(() => {
+          powerUpElement.classList.remove("collecting");
+        }, 500);
+      }
+
       switch (type) {
         case "SPEED":
           speedUpCount.current++;
@@ -392,9 +402,46 @@ export default function Game() {
     });
   };
 
+  const createPixelArt = (text: string) => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return [];
+
+    // Set canvas size
+    canvas.width = GRID_SIZE * CELL_SIZE;
+    canvas.height = GRID_SIZE * CELL_SIZE;
+
+    // Set text properties
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 24px monospace";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    // Draw text
+    ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+
+    // Get pixel data
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const pixels = [];
+
+    // Convert to grid positions
+    for (let y = 0; y < GRID_SIZE; y++) {
+      for (let x = 0; x < GRID_SIZE; x++) {
+        const i = (y * canvas.width + x) * 4;
+        if (imageData.data[i + 3] > 128) {
+          // Check alpha channel
+          pixels.push({ x, y });
+        }
+      }
+    }
+
+    return pixels;
+  };
+
   const handleNameSubmit = (name?: string) => {
     setShowNameDialog(false);
     if (name) {
+      setLastPlayerName(name);
       addToLeaderboard({
         name,
         score: gameState.score,
@@ -406,6 +453,9 @@ export default function Game() {
 
   return (
     <div className="flex flex-col items-center justify-center w-full max-w-2xl mx-auto">
+      <h1 className="text-4xl font-bold mb-6 bg-gradient-to-r from-vercel-blue via-vercel-cyan to-vercel-purple bg-clip-text text-transparent">
+        SnakeReact
+      </h1>
       <div className="flex justify-between items-center w-full mb-4">
         <div className="text-2xl font-bold" role="status" aria-live="polite">
           Score: {gameState.score}
@@ -471,6 +521,12 @@ export default function Game() {
             const powerUp = gameState.powerUps.find(
               (p) => p.position.x === x && p.position.y === y
             );
+            const isPixelArt =
+              gameState.isGameOver &&
+              lastPlayerName &&
+              createPixelArt(lastPlayerName).some(
+                (p) => p.x === x && p.y === y
+              );
 
             return (
               <div
@@ -480,8 +536,14 @@ export default function Game() {
                   ${isHead ? "bg-vercel-blue" : isSnake ? "bg-vercel-cyan" : ""}
                   ${isFood ? "food" : ""}
                   ${powerUp ? "power-up" : ""}
-                  ${!isSnake && !isFood && !powerUp ? "bg-gray-800" : ""}
+                  ${isPixelArt ? "bg-white" : ""}
+                  ${
+                    !isSnake && !isFood && !powerUp && !isPixelArt
+                      ? "bg-gray-800"
+                      : ""
+                  }
                 `}
+                data-type={powerUp?.type}
                 role="gridcell"
                 aria-label={
                   isHead
@@ -492,6 +554,8 @@ export default function Game() {
                     ? "Food"
                     : powerUp
                     ? `Power-up: ${powerUp.type}`
+                    : isPixelArt
+                    ? "Pixel art"
                     : "Empty cell"
                 }
               />
@@ -509,13 +573,30 @@ export default function Game() {
               {gameState.isGameOver ? (
                 <>
                   <h2 className="text-2xl font-bold mb-4">Game Over!</h2>
-                  <button
-                    onClick={resetGame}
-                    className="btn btn-primary"
-                    aria-label="Play Again"
-                  >
-                    Play Again
-                  </button>
+                  {lastPlayerName && (
+                    <p className="text-lg mb-4">
+                      Last Player: {lastPlayerName}
+                    </p>
+                  )}
+                  <div className="flex gap-4 justify-center">
+                    <button
+                      onClick={resetGame}
+                      className="btn btn-primary"
+                      aria-label="Play Again"
+                    >
+                      Play Again
+                    </button>
+                    <button
+                      onClick={() => {
+                        setLastPlayerName("");
+                        resetGame();
+                      }}
+                      className="btn btn-secondary"
+                      aria-label="New Game"
+                    >
+                      New Game
+                    </button>
+                  </div>
                 </>
               ) : (
                 <button
